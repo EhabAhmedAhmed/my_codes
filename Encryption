@@ -1,3 +1,4 @@
+//Encryption
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -70,5 +71,144 @@ int main() {
     handleFile(filePath, outputPath, shiftValue, true);
     showDecryptedPreview(outputPath, shiftValue);
 
+    return 0;
+}
+
+
+//Find replace
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+void findAndReplace(const string& filename, const string& target, const string& replacement) {
+    ifstream inputFile(filename);
+    if (!inputFile) {
+        cerr << "Error: Cannot open file!" << endl;
+        return;
+    }
+
+    string content, line;
+    while (getline(inputFile, line)) {
+        size_t pos = 0;
+        while ((pos = line.find(target, pos)) != string::npos) {
+            line.replace(pos, target.length(), replacement);
+            pos += replacement.length();
+        }
+        content += line + "\n";
+    }
+    inputFile.close();
+
+    ofstream outputFile("output.txt");
+    if (!outputFile) {
+        cerr << "Error: Cannot create output file!" << endl;
+        return;
+    }
+
+    outputFile << content;
+    outputFile.close();
+    cout << "Replacement done! Check 'output.txt'." << endl;
+}
+
+int main() {
+    string filename, target, replacement;
+    
+    cout << "Enter file name: ";
+    cin >> filename;
+    cout << "Enter word to replace: ";
+    cin >> target;
+    cout << "Enter replacement word: ";
+    cin >> replacement;
+
+    findAndReplace(filename, target, replacement);
+    return 0;
+}
+
+
+//Fat
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+void readFAT(const string& filename) {
+    ifstream file(filename, ios::binary);
+    if (!file) {
+        cerr << "Error: Cannot open FAT file!" << endl;
+        return;
+    }
+
+    vector<unsigned short> FAT;
+    unsigned short entry;
+
+    while (file.read(reinterpret_cast<char*>(&entry), sizeof(entry))) {
+        FAT.push_back(entry);
+    }
+
+    file.close();
+
+    cout << "FAT Table Content:" << endl;
+    for (size_t i = 0; i < FAT.size(); ++i) {
+        cout << "Entry " << i << ": " << FAT[i] << endl;
+    }
+}
+
+int main() {
+    string filename;
+    cout << "Enter FAT table file name: ";
+    cin >> filename;
+
+    readFAT(filename);
+    return 0;
+}
+
+
+
+//Buffer
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+#define BUFFER_SIZE 1024  // حجم البافر
+
+void bufferSimulation(const string& inputFile, const string& outputFile) {
+    ifstream inFile(inputFile, ios::binary);
+    if (!inFile) {
+        cerr << "Error: Cannot open input file!" << endl;
+        return;
+    }
+
+    ofstream outFile(outputFile, ios::binary);
+    if (!outFile) {
+        cerr << "Error: Cannot create output file!" << endl;
+        return;
+    }
+
+    vector<char> buffer(BUFFER_SIZE);
+    
+    while (!inFile.eof()) {
+        inFile.read(buffer.data(), BUFFER_SIZE);
+        streamsize bytesRead = inFile.gcount();
+        outFile.write(buffer.data(), bytesRead);
+    }
+
+    inFile.close();
+    outFile.close();
+    
+    cout << "Data transfer completed using buffer!" << endl;
+}
+
+int main() {
+    string inputFile, outputFile;
+    cout << "Enter input file name: ";
+    cin >> inputFile;
+    cout << "Enter output file name: ";
+    cin >> outputFile;
+
+    bufferSimulation(inputFile, outputFile);
     return 0;
 }
